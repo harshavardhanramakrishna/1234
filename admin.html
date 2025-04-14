@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Clever Assist Connect</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Login Form -->
+    <div id="admin-login" class="login-form">
+        <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+        <form id="admin-login-form">
+            <div class="mb-4">
+                <label for="admin-username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                <input type="text" id="admin-username" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+            </div>
+            <div class="mb-6">
+                <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="admin-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-200">Login</button>
+            <div class="mt-4 text-center">
+                <a href="index.html" class="text-sm text-indigo-600 hover:text-indigo-800">Back to Chat</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="hidden">
+        <div class="dashboard-container">
+            <!-- Sidebar -->
+            <div class="sidebar p-4">
+                <div class="flex items-center justify-center mb-8">
+                    <img src="https://via.placeholder.com/40x40" alt="Company Logo" class="h-8">
+                    <h1 class="ml-2 text-lg font-semibold text-gray-800">Admin Panel</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li class="mb-1">
+                            <a href="#" class="block px-4 py-2 rounded-md bg-indigo-50 text-indigo-700 font-medium">
+                                <i class="fas fa-comment-dots mr-2"></i> Chat History
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="#" class="block px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-users mr-2"></i> Agents
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="#" class="block px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-chart-bar mr-2"></i> Analytics
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="#" class="block px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i> Settings
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="mt-auto pt-4 border-t border-gray-200">
+                    <button id="admin-logout" class="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-md">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">Chat History</h2>
+                    <div class="flex space-x-2">
+                        <div class="relative">
+                            <input type="text" id="search-input" placeholder="Search chats..." class="pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <select id="filter-status" class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Chat List Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Room ID</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Started</th>
+                                <th>Last Activity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chat-list">
+                            <!-- Chat rows will be populated here -->
+                            <tr class="chat-row">
+                                <td>room_123456</td>
+                                <td>John Doe <span class="text-xs text-gray-500">(john@example.com)</span></td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>Apr 10, 2025 10:30 AM</td>
+                                <td>5 minutes ago</td>
+                                <td>
+                                    <button class="text-indigo-600 hover:text-indigo-800 mr-2 view-chat" data-room-id="room_123456">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-red-600 hover:text-red-800 delete-chat" data-room-id="room_123456">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="chat-row">
+                                <td>room_654321</td>
+                                <td>Jane Smith <span class="text-xs text-gray-500">(jane@example.com)</span></td>
+                                <td><span class="badge badge-pending">Pending</span></td>
+                                <td>Apr 10, 2025 9:15 AM</td>
+                                <td>20 minutes ago</td>
+                                <td>
+                                    <button class="text-indigo-600 hover:text-indigo-800 mr-2 view-chat" data-room-id="room_654321">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-red-600 hover:text-red-800 delete-chat" data-room-id="room_654321">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Chat Transcript Modal -->
+                <div id="transcript-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                    <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-screen overflow-hidden">
+                        <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-800">Chat Transcript</h3>
+                            <button id="close-transcript" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="p-6 overflow-y-auto max-h-[70vh]">
+                            <div class="mb-4">
+                                <h4 class="text-md font-medium text-gray-700">Room ID: <span id="transcript-room-id">room_123456</span></h4>
+                                <p class="text-sm text-gray-600">User: <span id="transcript-user">John Doe (john@example.com)</span></p>
+                                <p class="text-sm text-gray-600">Started: <span id="transcript-started">Apr 10, 2025 10:30 AM</span></p>
+                            </div>
+                            <div id="transcript-messages" class="space-y-4">
+                                <!-- Transcript messages will be populated here -->
+                            </div>
+                        </div>
+                        <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+                            <button id="download-transcript" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                <i class="fas fa-download mr-2"></i> Download Transcript
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
